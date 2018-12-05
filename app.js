@@ -8,7 +8,7 @@ let Bear = require('./app/model/bear')
 let app = express();
 
 //Connect database
-mongoose.connect('mongodb://localhost:27017/bears')
+mongoose.connect("mongodb://localhost:27017/myapp");
 
 // configure app to use bodyParser()
 // this will let us get the data from a POST
@@ -20,8 +20,27 @@ let port = 3000;
 
 let router = express.Router();
 
+router.use((req, res, next) => {
+  console.log("something is happening.")
+  next() //If you don't add this then the flow stops at this middleware
+})
+
 router.get('/', (req, res) => {
   res.json({message: "this worked."})
+})
+
+router.route('/bears')
+.post((req, res) => {
+  let bear = new Bear()
+  bear.name = req.body.name
+  
+  bear.save(function(err) {
+    console.log("here")
+    if (err)  {
+      res.send(err)
+    }
+    res.send({message: "Bear was created."})
+  })
 })
 
 app.use('/api', router)
