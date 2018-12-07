@@ -30,18 +30,56 @@ router.get('/', (req, res) => {
 })
 
 router.route('/bears')
-.post((req, res) => {
-  let bear = new Bear()
-  bear.name = req.body.name
-  
-  bear.save(function(err) {
-    console.log("here")
-    if (err)  {
-      res.send(err)
-    }
-    res.send({message: "Bear was created."})
+  .post((req, res) => {
+    let bear = new Bear()
+    bear.name = req.body.name
+    
+    bear.save(function(err) {
+      if (err)  {
+        res.send(err)
+      }
+      res.send({message: "Bear was created."})
+    })
   })
-})
+
+  .get((req, res) => {
+    Bear.find((err, bears) => {
+      if (err)  {
+        res.send(err)
+      }
+
+      res.json(bears)
+    })
+  })
+
+router.route('/bears/:bear_id')
+  .get((req, res) =>  {
+    Bear.findById(req.params.bear_id, (err, bear) =>  {
+      if (err)  {
+        res.send(err)
+      }
+
+      res.json(bear)
+    })
+  })
+
+  .put((req, res) => {
+    Bear.findById(req.params.bear_id, (err, bear) =>  {
+      if (err)  {
+        res.send(err)
+      }
+      
+      bear.name = req.body.name
+
+      bear.save(err => {
+        if (err)  {
+          res.send(err)
+        }
+
+        res.json({message: "bear was created", bear: bear})
+      })
+    })
+  })
 
 app.use('/api', router)
 
